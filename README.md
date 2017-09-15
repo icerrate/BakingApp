@@ -1,4 +1,4 @@
-# Popular-Movies (Stage 1)
+# Baking-App
 
 Project for Udacity - Associate Android Developer Fast Track Nanodegree.
 
