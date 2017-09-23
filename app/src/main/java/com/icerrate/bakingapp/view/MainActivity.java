@@ -1,7 +1,9 @@
-package com.icerrate.bakingapp;
+package com.icerrate.bakingapp.view;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.icerrate.bakingapp.R;
 
 public class MainActivity extends AppCompatActivity {
 
