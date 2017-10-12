@@ -13,8 +13,8 @@ public class Recipe implements Parcelable {
 
     private int id;
     private String name;
-    private ArrayList<Object> ingredients;
-    private ArrayList<Object> steps;
+    private ArrayList<Ingredient> ingredients;
+    private ArrayList<Step> steps;
     private int servings;
     private String image;
 
@@ -29,11 +29,11 @@ public class Recipe implements Parcelable {
         return name;
     }
 
-    public ArrayList<Object> getIngredients() {
+    public ArrayList<Ingredient> getIngredients() {
         return ingredients;
     }
 
-    public ArrayList<Object> getSteps() {
+    public ArrayList<Step> getSteps() {
         return steps;
     }
 
@@ -48,19 +48,27 @@ public class Recipe implements Parcelable {
     protected Recipe(Parcel in) {
         id = in.readInt();
         name = in.readString();
-        ingredients = in.readArrayList(null);
-        steps = in.readArrayList(null);
+        if (in.readByte() == 0x01) {
+            ingredients = new ArrayList<>();
+            in.readList(ingredients, Ingredient.class.getClassLoader());
+        } else {
+            ingredients = null;
+        }
+        if (in.readByte() == 0x01) {
+            steps = new ArrayList<>();
+            in.readList(steps, Step.class.getClassLoader());
+        } else {
+            steps = null;
+        }
         servings = in.readInt();
         image = in.readString();
     }
-
 
     @Override
     public int describeContents() {
         return 0;
     }
 
-    // Required method to write to Parcel
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(id);
@@ -82,6 +90,5 @@ public class Recipe implements Parcelable {
         public Recipe[] newArray(int size) {
             return new Recipe[size];
         }
-
     };
 }

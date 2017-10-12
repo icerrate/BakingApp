@@ -3,6 +3,9 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     buildToolsVersion "26.0.1"
+
+    def BACKING_APP_API_URL = '"https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/"'
+
     defaultConfig {
         applicationId "com.icerrate.bakingapp"
         minSdkVersion 16
@@ -10,6 +13,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "API_BASE_URL", BACKING_APP_API_URL
     }
     buildTypes {
         release {
@@ -27,6 +31,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:26.0.2'
     compile 'com.android.support:design:26.0.2'
     compile 'com.android.support:recyclerview-v7:26.0.2'
+    compile 'com.android.support:cardview-v7:26.0.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
     compile 'com.jakewharton:butterknife:8.8.1'
