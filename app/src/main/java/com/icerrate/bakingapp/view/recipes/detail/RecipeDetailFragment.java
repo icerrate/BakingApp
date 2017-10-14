@@ -12,9 +12,10 @@ import android.widget.TextView;
 import com.icerrate.bakingapp.R;
 import com.icerrate.bakingapp.data.model.Recipe;
 import com.icerrate.bakingapp.data.model.Step;
-import com.icerrate.bakingapp.utils.InjectionUtils;
 import com.icerrate.bakingapp.view.common.BaseFragment;
 import com.icerrate.bakingapp.view.common.VerticalSpaceItemDecoration;
+import com.icerrate.bakingapp.view.step.StepDetailActivity;
+import com.icerrate.bakingapp.view.step.StepDetailFragment;
 
 import java.util.ArrayList;
 
@@ -55,8 +56,7 @@ public class RecipeDetailFragment extends BaseFragment implements RecipeDetailVi
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        presenter = new RecipeDetailPresenter(this,
-                InjectionUtils.recipeRepository());
+        presenter = new RecipeDetailPresenter(this);
     }
 
     @Override
@@ -125,8 +125,7 @@ public class RecipeDetailFragment extends BaseFragment implements RecipeDetailVi
 
     @Override
     public void goToStepDetail(Step step) {
-        //TODO
-        /*startActivity(RecipeDetailActivity.makeIntent(getActivity())
-                .putExtra(KEY_RECIPE, recipe);*/
+        startActivity(StepDetailActivity.makeIntent(getContext())
+                .putExtra(StepDetailFragment.KEY_STEP_DETAIL, step));
     }
 }

@@ -18,10 +18,10 @@ public class RecipeDetailActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
-        setTitle(getString(R.string.title_activity_recipe_detail));
         setNavigationToolbar(true);
         if (savedInstanceState == null) {
             Recipe recipeDetail = getIntent().getParcelableExtra(RecipeDetailFragment.KEY_RECIPE_DETAIL);
+            setTitle(recipeDetail.getName());
             RecipeDetailFragment recipeDetailFragment = RecipeDetailFragment.newInstance(recipeDetail);
             replaceFragment(R.id.content, recipeDetailFragment);
         }

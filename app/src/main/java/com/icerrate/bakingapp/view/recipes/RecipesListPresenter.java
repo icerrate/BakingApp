@@ -32,7 +32,7 @@ public class RecipesListPresenter extends BasePresenter<RecipesListView> {
     }
 
     private void getInternalRecipesList() {
-        view.showProgressBar(false);
+        view.showProgressBar(true);
         recipeRepository.getRecipes(new BaseCallback<ArrayList<Recipe>>() {
             @Override
             public void onSuccess(ArrayList<Recipe> response) {
