@@ -2,7 +2,6 @@ package com.icerrate.bakingapp.view.recipes;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,6 +14,8 @@ import com.icerrate.bakingapp.data.model.Recipe;
 import com.icerrate.bakingapp.utils.InjectionUtils;
 import com.icerrate.bakingapp.view.common.BaseFragment;
 import com.icerrate.bakingapp.view.common.VerticalSpaceItemDecoration;
+import com.icerrate.bakingapp.view.recipes.detail.RecipeDetailActivity;
+import com.icerrate.bakingapp.view.recipes.detail.RecipeDetailFragment;
 
 import java.util.ArrayList;
 
@@ -30,7 +31,7 @@ public class RecipesListFragment extends BaseFragment implements RecipesListView
     public static String KEY_RECIPES = "RECIPES_KEY";
 
     @BindView(R.id.recipes)
-    public RecyclerView movirecipesRecyclerView;
+    public RecyclerView recipesRecyclerView;
 
     @BindView(R.id.recipes_no_data)
     public TextView noDataTextView;
@@ -64,10 +65,8 @@ public class RecipesListFragment extends BaseFragment implements RecipesListView
         setupView();
         if (savedInstanceState != null) {
             restoreInstanceState(savedInstanceState);
-            presenter.loadRecipes();
-        } else {
-            presenter.onRefreshView();
         }
+        presenter.loadRecipes();
     }
 
     @Override
@@ -84,19 +83,9 @@ public class RecipesListFragment extends BaseFragment implements RecipesListView
     private void setupView() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         adapter = new RecipesListAdapter(this);
-        movirecipesRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(8,8));
-        movirecipesRecyclerView.setAdapter(adapter);
-        movirecipesRecyclerView.setLayoutManager(linearLayoutManager);
-        //refresh
-        if (refreshLayout != null) {
-            refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    presenter.onRefreshView();
-                }
-            });
-            refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
-        }
+        recipesRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(8,8));
+        recipesRecyclerView.setAdapter(adapter);
+        recipesRecyclerView.setLayoutManager(linearLayoutManager);
     }
 
     @Override
@@ -119,8 +108,7 @@ public class RecipesListFragment extends BaseFragment implements RecipesListView
 
     @Override
     public void goToRecipeDetail(Recipe recipe) {
-        //TODO
-        /*startActivity(RecipeeDetailActivity.makeIntent(getActivity())
-                .putExtra(KEY_RECIPE, recipe);*/
+        startActivity(RecipeDetailActivity.makeIntent(getContext())
+                .putExtra(RecipeDetailFragment.KEY_RECIPE_DETAIL, recipe));
     }
 }

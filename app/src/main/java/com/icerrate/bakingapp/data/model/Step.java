@@ -9,7 +9,7 @@ import android.os.Parcelable;
 
 public class Step implements Parcelable {
 
-    private int id;
+    private Integer id;
     private String shortDescription;
     private String description;
     private String videoURL;
@@ -18,7 +18,7 @@ public class Step implements Parcelable {
     public Step() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

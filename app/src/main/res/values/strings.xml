@@ -5,10 +5,16 @@
     <string name="confirm_button">GOT IT</string>
     <string name="not_connected">No internet connection</string>
 
+    <!-- Recipes List -->
     <string name="title_activity_recipes">Backing App</string>
     <string name="recipes_no_data">No Recipes Found</string>
     <string name="view_action">View</string>
     <string name="share_action">Share</string>
     <string name="recipe_description">Using %1$d ingredients on %2$d steps.\nServings: %3$d</string>
 
+    <!-- Recipe Detail -->
+    <string name="title_activity_recipe_detail">Recipe Detail</string>
+    <string name="subtitle_ingredients">Ingredients</string>
+    <string name="subtitle_steps">Steps</string>
+    <string name="steps_no_data">No Steps Found</string>
 </resources>

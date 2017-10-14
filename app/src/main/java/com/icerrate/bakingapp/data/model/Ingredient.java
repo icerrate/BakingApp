@@ -9,14 +9,14 @@ import android.os.Parcelable;
 
 public class Ingredient implements Parcelable {
 
-    private double quantity;
+    private Double quantity;
     private String measure;
     private String ingredient;
 
     public Ingredient() {
     }
 
-    public double getQuantity() {
+    public Double getQuantity() {
         return quantity;
     }
 
@@ -29,7 +29,7 @@ public class Ingredient implements Parcelable {
     }
 
     public Ingredient(Parcel in) {
-        quantity = in.readInt();
+        quantity = in.readDouble();
         measure = in.readString();
         ingredient = in.readString();
     }

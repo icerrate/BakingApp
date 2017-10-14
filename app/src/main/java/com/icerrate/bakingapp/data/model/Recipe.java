@@ -11,11 +11,11 @@ import java.util.ArrayList;
 
 public class Recipe implements Parcelable {
 
-    private int id;
+    private Integer id;
     private String name;
     private ArrayList<Ingredient> ingredients;
     private ArrayList<Step> steps;
-    private int servings;
+    private Integer servings;
     private String image;
 
     public Recipe() {
@@ -48,18 +48,8 @@ public class Recipe implements Parcelable {
     protected Recipe(Parcel in) {
         id = in.readInt();
         name = in.readString();
-        if (in.readByte() == 0x01) {
-            ingredients = new ArrayList<>();
-            in.readList(ingredients, Ingredient.class.getClassLoader());
-        } else {
-            ingredients = null;
-        }
-        if (in.readByte() == 0x01) {
-            steps = new ArrayList<>();
-            in.readList(steps, Step.class.getClassLoader());
-        } else {
-            steps = null;
-        }
+        ingredients = in.readArrayList(Ingredient.class.getClassLoader());
+        steps = in.readArrayList(Step.class.getClassLoader());
         servings = in.readInt();
         image = in.readString();
     }

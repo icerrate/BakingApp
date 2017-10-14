@@ -25,6 +25,7 @@ import butterknife.ButterKnife;
 public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.RecipeViewHolder> {
 
     private ArrayList<Recipe> data;
+
     private OnItemClickListener onItemClickListener;
 
     public RecipesListAdapter(OnItemClickListener onItemClickListener) {
@@ -58,7 +59,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
                 //.placeholder(context.getResources().getDrawable(R.drawable.poster_placeholder))
                 .into(holder.photoImageView);
 
-        holder.itemView.setTag(recipe);
+        holder.viewButton.setTag(recipe);
     }
 
     @Override
@@ -95,7 +96,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
             super(itemView);
             ButterKnife.bind(this, itemView);
             this.onItemClickListener = onItemClickListener;
-            itemView.setOnClickListener(this);
+            viewButton.setOnClickListener(this);
         }
 
         @Override

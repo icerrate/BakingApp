@@ -1,6 +1,5 @@
 package com.icerrate.bakingapp.view.recipes;
 
-import com.icerrate.bakingapp.R;
 import com.icerrate.bakingapp.data.model.Recipe;
 import com.icerrate.bakingapp.data.source.RecipeRepository;
 import com.icerrate.bakingapp.view.common.BaseCallback;
@@ -23,11 +22,6 @@ public class RecipesListPresenter extends BasePresenter<RecipesListView> {
         this.recipeRepository = recipeRepository;
     }
 
-    public void onRefreshView() {
-        recipesList = null;
-        loadRecipes();
-    }
-
     public void loadRecipes() {
         if (recipesList == null) {
             recipesList = new ArrayList<>();
@@ -38,12 +32,13 @@ public class RecipesListPresenter extends BasePresenter<RecipesListView> {
     }
 
     private void getInternalRecipesList() {
+        view.showProgressBar(false);
         recipeRepository.getRecipes(new BaseCallback<ArrayList<Recipe>>() {
             @Override
             public void onSuccess(ArrayList<Recipe> response) {
                 recipesList = response;
-                showRecipes(response, getStringRes(R.string.recipes_no_data));
-                finishLoading();
+                showRecipes(response);
+                view.showProgressBar(false);
             }
 
             @Override
@@ -52,12 +47,12 @@ public class RecipesListPresenter extends BasePresenter<RecipesListView> {
                 if (recipesList.isEmpty()) {
                     view.showNoDataView(true);
                 }
-                finishLoading();
+                view.showProgressBar(false);
             }
         });
     }
 
-    public void showRecipes(ArrayList<Recipe> recipes, String noDataText) {
+    public void showRecipes(ArrayList<Recipe> recipes) {
         if (recipes != null && !recipes.isEmpty()) {
             view.showNoDataView(false);
             view.showRecipes(recipes);
@@ -66,11 +61,6 @@ public class RecipesListPresenter extends BasePresenter<RecipesListView> {
                 view.showNoDataView(true);
             }
         }
-    }
-
-    private void finishLoading() {
-        view.showProgressBar(false);
-        view.showRefreshLayout(false);
     }
 
     public void onRecipeItemClick(final Recipe recipe) {
