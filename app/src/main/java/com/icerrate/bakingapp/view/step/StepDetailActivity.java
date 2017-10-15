@@ -18,12 +18,15 @@ public class StepDetailActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_base);
-        setNavigationToolbar(true);
         if (savedInstanceState == null) {
+            setNavigationToolbar(true);
             Step stepDetail = getIntent().getParcelableExtra(StepDetailFragment.KEY_STEP_DETAIL);
             setTitle(stepDetail.getShortDescription());
             StepDetailFragment stepDetailFragment = StepDetailFragment.newInstance(stepDetail);
             replaceFragment(R.id.content, stepDetailFragment);
+        } else {
+            StepDetailFragment stepDetailFragment = (StepDetailFragment) getSupportFragmentManager().findFragmentById(R.id.content);
+            stepDetailFragment.recreate();
         }
     }
 }

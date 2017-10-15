@@ -1,17 +1,24 @@
 package com.icerrate.bakingapp.view.step;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v7.widget.CardView;
+import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -24,7 +31,6 @@ import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -53,6 +59,9 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     @BindView(R.id.thumbnail)
     public ImageView thumbnailImageView;
 
+    @BindView(R.id.description_card)
+    public CardView descriptionCardView;
+
     @BindView(R.id.description)
     public TextView descriptionTextView;
 
@@ -61,6 +70,8 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     private MediaSessionCompat mediaSession;
 
     private PlaybackStateCompat.Builder stateBuilder;
+
+    private boolean showDescription = true;
 
     private StepDetailPresenter presenter;
 
@@ -115,6 +126,12 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     private void setupView() {
         videoExoPlayerView.setControllerVisibilityListener(this);
         videoExoPlayerView.requestFocus();
+        descriptionCardView.setVisibility(showDescription ? View.VISIBLE : View.GONE);
+        if (!showDescription) {
+            Display display = getActivity().getWindowManager().getDefaultDisplay();
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, display.getHeight());
+            videoExoPlayerView.setLayoutParams(layoutParams);
+        }
     }
 
     private void initializeMediaSession() {
@@ -154,9 +171,10 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
 
     private void initializePlayer() {
         if (exoPlayer == null) {
+            exoPlayer = ExoPlayerFactory.newSimpleInstance(
+                    new DefaultRenderersFactory(getContext()),
+                    new DefaultTrackSelector(), new DefaultLoadControl());
 
-            TrackSelector trackSelector = new DefaultTrackSelector();
-            exoPlayer = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector);
             videoExoPlayerView.setPlayer(exoPlayer);
             exoPlayer.addListener(this);
 
@@ -181,47 +199,6 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
         }
     }
 
-    private void updateButtonVisibilities() {
-        /*debugRootView.removeAllViews();
-
-        retryButton.setVisibility(inErrorState ? View.VISIBLE : View.GONE);
-        debugRootView.addView(retryButton);
-
-        if (player == null) {
-            return;
-        }
-
-        MappedTrackInfo mappedTrackInfo = trackSelector.getCurrentMappedTrackInfo();
-        if (mappedTrackInfo == null) {
-            return;
-        }
-
-        for (int i = 0; i < mappedTrackInfo.length; i++) {
-            TrackGroupArray trackGroups = mappedTrackInfo.getTrackGroups(i);
-            if (trackGroups.length != 0) {
-                Button button = new Button(this);
-                int label;
-                switch (player.getRendererType(i)) {
-                    case C.TRACK_TYPE_AUDIO:
-                        label = R.string.audio;
-                        break;
-                    case C.TRACK_TYPE_VIDEO:
-                        label = R.string.video;
-                        break;
-                    case C.TRACK_TYPE_TEXT:
-                        label = R.string.text;
-                        break;
-                    default:
-                        continue;
-                }
-                button.setText(label);
-                button.setTag(i);
-                button.setOnClickListener(this);
-                debugRootView.addView(button, debugRootView.getChildCount() - 1);
-            }
-        }*/
-    }
-
     @Override
     public void onStart() {
         super.onStart();
@@ -233,6 +210,7 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     @Override
     public void onResume() {
         super.onResume();
+        hideSystemUi();
         if ((Util.SDK_INT <= 23 || exoPlayer == null)) {
             initializePlayer();
         }
@@ -251,6 +229,28 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
         super.onStop();
         if (Util.SDK_INT > 23) {
             releasePlayer();
+        }
+    }
+
+    @SuppressLint("InlinedApi")
+    private void hideSystemUi() {
+        videoExoPlayerView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+    }
+
+    public void recreate() {
+        Display mDisplay = getActivity().getWindowManager().getDefaultDisplay();
+        switch (mDisplay.getRotation()) {
+            case Surface.ROTATION_90: case Surface.ROTATION_270:
+                showDescription = false;
+                break;
+            default:
+                showDescription = true;
+                break;
         }
     }
 
