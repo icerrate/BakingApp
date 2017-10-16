@@ -37,6 +37,7 @@ import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.icerrate.bakingapp.R;
 import com.icerrate.bakingapp.data.model.Step;
+import com.icerrate.bakingapp.utils.MeasureUtils;
 import com.icerrate.bakingapp.view.common.BaseFragment;
 
 import butterknife.BindView;
@@ -145,9 +146,9 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
         stateBuilder = new PlaybackStateCompat.Builder()
                 .setActions(
                         PlaybackStateCompat.ACTION_PLAY |
-                                PlaybackStateCompat.ACTION_PAUSE |
-                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
-                                PlaybackStateCompat.ACTION_PLAY_PAUSE);
+                        PlaybackStateCompat.ACTION_PAUSE |
+                        PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                        PlaybackStateCompat.ACTION_PLAY_PAUSE);
 
         mediaSession.setPlaybackState(stateBuilder.build());
         mediaSession.setCallback(new MediaSessionCompat.Callback() {
@@ -210,7 +211,6 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     @Override
     public void onResume() {
         super.onResume();
-        hideSystemUi();
         if ((Util.SDK_INT <= 23 || exoPlayer == null)) {
             initializePlayer();
         }
@@ -242,16 +242,46 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
 
-    public void recreate() {
+    @SuppressLint("InlinedApi")
+    private void showSystemUi() {
+        videoExoPlayerView.setSystemUiVisibility(View.VISIBLE);
+    }
+
+    public void onConfigurationChanged() {
         Display mDisplay = getActivity().getWindowManager().getDefaultDisplay();
         switch (mDisplay.getRotation()) {
             case Surface.ROTATION_90: case Surface.ROTATION_270:
                 showDescription = false;
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mDisplay.getHeight());
+                videoExoPlayerView.setLayoutParams(layoutParams);
+                hideSystemUi();
+                fragmentListener.setToolbarVisibility(View.GONE);
+                descriptionCardView.setVisibility(View.GONE);
                 break;
             default:
                 showDescription = true;
+                layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, MeasureUtils.dpToPx(250));
+                videoExoPlayerView.setLayoutParams(layoutParams);
+                showSystemUi();
+                fragmentListener.setToolbarVisibility(View.VISIBLE);
+                descriptionCardView.setVisibility(View.VISIBLE);
                 break;
         }
+    }
+
+    private void setLayout(int rotation) {
+        /*View view = null;
+        if (rotation == 2)
+            view = mInflater.inflate(R.layout.segment_dettaglio_evento_land, null);
+        else if (rotation == 1)
+            view = mInflater.inflate(R.layout.segment_dettaglio_evento, null);
+
+        if (rotation == 2 || rotation == 1) {
+            ViewGroup viewGroup = (ViewGroup) mRoot.findViewById(R.id.dettaglio_evento_root);
+            viewGroup.removeAllViews();
+            viewGroup.addView(view, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+            this.initComponent();
+        }*/
     }
 
     @Override

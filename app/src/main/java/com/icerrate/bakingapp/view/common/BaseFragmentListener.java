@@ -13,4 +13,7 @@ public interface BaseFragmentListener {
     void replaceFragment(int containerId, Fragment fragment);
 
     void setTitle(String title);
+
+    void setToolbarVisibility(int visibility);
+
 }

@@ -64,4 +64,11 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
             getSupportActionBar().setTitle(title);
         }
     }
+
+    @Override
+    public void setToolbarVisibility(int visibility) {
+        if (toolbar != null) {
+            toolbar.setVisibility(visibility);
+        }
+    }
 }

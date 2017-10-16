@@ -20,10 +20,14 @@
         </activity>
         <activity
             android:name=".view.recipes.detail.RecipeDetailActivity"
+            android:label="@string/title_activity_recipe_detail"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".view.step.StepDetailActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"
+            android:label="@string/title_activity_step_detail"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>

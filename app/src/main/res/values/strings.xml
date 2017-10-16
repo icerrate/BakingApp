@@ -13,12 +13,13 @@
     <string name="recipe_description">Using %1$d ingredients on %2$d steps.\nServings: %3$d</string>
 
     <!-- Recipe Detail -->
-
+    <string name="title_activity_recipe_detail">Recipe Detail</string>
     <string name="subtitle_ingredients">Ingredients</string>
     <string name="subtitle_steps">Steps</string>
     <string name="steps_no_data">No Steps Found</string>
 
     <!-- Recipe Detail -->
+    <string name="title_activity_step_detail">Step Detail</string>
     <string name="subtitle_description">Description</string>
     <string name="description_no_data">No Description Found</string>
 </resources>

@@ -10,6 +10,8 @@ import com.icerrate.bakingapp.view.common.BaseActivity;
 
 public class RecipeDetailActivity extends BaseActivity {
 
+    private Recipe recipeDetail;
+
     public static Intent makeIntent(Context context) {
         return new Intent(context, RecipeDetailActivity.class);
     }
@@ -20,10 +22,24 @@ public class RecipeDetailActivity extends BaseActivity {
         setContentView(R.layout.activity_base);
         setNavigationToolbar(true);
         if (savedInstanceState == null) {
-            Recipe recipeDetail = getIntent().getParcelableExtra(RecipeDetailFragment.KEY_RECIPE_DETAIL);
-            setTitle(recipeDetail.getName());
+            recipeDetail = getIntent().getParcelableExtra(RecipeDetailFragment.KEY_RECIPE_DETAIL);
             RecipeDetailFragment recipeDetailFragment = RecipeDetailFragment.newInstance(recipeDetail);
             replaceFragment(R.id.content, recipeDetailFragment);
+        } else {
+            onRestoreInstanceState(savedInstanceState);
         }
+        setTitle(recipeDetail.getName());
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(RecipeDetailFragment.KEY_RECIPE_DETAIL, recipeDetail);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        recipeDetail = savedInstanceState.getParcelable(RecipeDetailFragment.KEY_RECIPE_DETAIL);
     }
 }
