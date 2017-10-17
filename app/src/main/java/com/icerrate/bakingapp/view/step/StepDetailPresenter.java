@@ -12,6 +12,10 @@ public class StepDetailPresenter extends BasePresenter<StepDetailView> {
 
     private Step stepDetail;
 
+    private Long videoTime = 3L;
+
+    private Boolean videoAutoplay = false;
+
     public StepDetailPresenter(StepDetailView view) {
         super(view);
     }
@@ -25,14 +29,11 @@ public class StepDetailPresenter extends BasePresenter<StepDetailView> {
 
     private void showMediaResource(String thumbnailUrl, String videoUrl) {
         if (thumbnailUrl != null && !thumbnailUrl.isEmpty()) {
-            view.hideVideo();
-            view.showThumbnail(thumbnailUrl);
+            view.showThumbnail(true);
+            view.loadThumbnailSource(thumbnailUrl);
         } else if (videoUrl != null && !videoUrl.isEmpty()) {
-            view.hideThumbnail();
-            view.showVideo(videoUrl);
-        } else {
-            view.hideThumbnail();
-            view.hideVideo();
+            view.showVideo(true);
+            view.loadVideoSource(videoUrl, videoTime, videoAutoplay);
         }
     }
 
@@ -44,6 +45,10 @@ public class StepDetailPresenter extends BasePresenter<StepDetailView> {
         }
     }
 
+    public boolean containsVideo() {
+        return stepDetail.getVideoURL() != null && !stepDetail.getVideoURL().isEmpty();
+    }
+
     public void setStepDetail(Step stepDetail) {
         this.stepDetail = stepDetail;
     }
@@ -51,8 +56,16 @@ public class StepDetailPresenter extends BasePresenter<StepDetailView> {
     public Step getStepDetail() {
         return stepDetail;
     }
+    public Long getVideoTime() {
+        return videoTime;
+    }
+    public Boolean getVideoAutoplay() {
+        return videoAutoplay;
+    }
 
-    public void loadPresenterState(Step stepDetail) {
+    public void loadPresenterState(Step stepDetail, Long videoTime, Boolean videoAutoplay) {
         this.stepDetail = stepDetail;
+        this.videoTime = videoTime;
+        this.videoAutoplay = videoAutoplay;
     }
 }

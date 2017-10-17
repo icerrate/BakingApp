@@ -1,4 +1,4 @@
-package com.icerrate.bakingapp.view.recipes.detail;
+package com.icerrate.bakingapp.view.step;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,17 +18,17 @@ import butterknife.ButterKnife;
  * @author Ivan Cerrate.
  */
 
-public class StepsListAdapter extends RecyclerView.Adapter<StepsListAdapter.StepViewHolder> {
+public class StepListAdapter extends RecyclerView.Adapter<StepListAdapter.StepViewHolder> {
 
     private ArrayList<Step> data;
 
     private OnItemClickListener onItemClickListener;
 
-    public StepsListAdapter(OnItemClickListener onItemClickListener) {
+    public StepListAdapter(OnItemClickListener onItemClickListener) {
         this(new ArrayList<Step>(), onItemClickListener);
     }
 
-    public StepsListAdapter(ArrayList<Step> steps, OnItemClickListener onItemClickListener) {
+    public StepListAdapter(ArrayList<Step> steps, OnItemClickListener onItemClickListener) {
         this.data = steps;
         this.onItemClickListener = onItemClickListener;
     }

@@ -56,9 +56,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
         holder.descriptionTextView.setText(description);
         GlideApp.with(context)
                 .load(recipe.getImage())
-                //.placeholder(context.getResources().getDrawable(R.drawable.poster_placeholder))
                 .into(holder.photoImageView);
-
         holder.viewButton.setTag(recipe);
     }
 

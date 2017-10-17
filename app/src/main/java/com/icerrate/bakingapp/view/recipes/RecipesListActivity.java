@@ -1,12 +1,11 @@
-package com.icerrate.bakingapp.view;
+package com.icerrate.bakingapp.view.recipes;
 
 import android.os.Bundle;
 
 import com.icerrate.bakingapp.R;
 import com.icerrate.bakingapp.view.common.BaseActivity;
-import com.icerrate.bakingapp.view.recipes.RecipesListFragment;
 
-public class MainActivity extends BaseActivity {
+public class RecipesListActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

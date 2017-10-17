@@ -2,9 +2,11 @@ package com.icerrate.bakingapp.view.recipes;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -14,8 +16,8 @@ import com.icerrate.bakingapp.data.model.Recipe;
 import com.icerrate.bakingapp.utils.InjectionUtils;
 import com.icerrate.bakingapp.view.common.BaseFragment;
 import com.icerrate.bakingapp.view.common.VerticalSpaceItemDecoration;
-import com.icerrate.bakingapp.view.recipes.detail.RecipeDetailActivity;
-import com.icerrate.bakingapp.view.recipes.detail.RecipeDetailFragment;
+import com.icerrate.bakingapp.view.recipe.RecipeDetailActivity;
+import com.icerrate.bakingapp.view.recipe.RecipeDetailFragment;
 
 import java.util.ArrayList;
 
@@ -81,11 +83,20 @@ public class RecipesListFragment extends BaseFragment implements RecipesListView
     }
 
     private void setupView() {
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), getColumns());
         adapter = new RecipesListAdapter(this);
         recipesRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(8,8));
         recipesRecyclerView.setAdapter(adapter);
-        recipesRecyclerView.setLayoutManager(linearLayoutManager);
+        recipesRecyclerView.setLayoutManager(gridLayoutManager);
+    }
+
+    private int getColumns() {
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        if (display.getRotation() == Surface.ROTATION_0) {
+            return 1;
+        } else {
+            return 3;
+        }
     }
 
     @Override

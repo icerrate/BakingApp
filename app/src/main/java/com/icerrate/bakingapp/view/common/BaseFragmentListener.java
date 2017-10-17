@@ -10,6 +10,8 @@ public interface BaseFragmentListener {
 
     void setNavigationToolbar(boolean navigation);
 
+    void enableRotation();
+
     void replaceFragment(int containerId, Fragment fragment);
 
     void setTitle(String title);

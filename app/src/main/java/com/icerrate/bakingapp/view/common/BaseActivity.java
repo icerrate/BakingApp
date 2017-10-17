@@ -1,5 +1,6 @@
 package com.icerrate.bakingapp.view.common;
 
+import android.content.pm.ActivityInfo;
 import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -27,6 +28,9 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
         unbinder = ButterKnife.bind(this);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        if(getResources().getBoolean(R.bool.portrait_only)){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
     }
 
     @Override
@@ -49,6 +53,11 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
         if (navigation && getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    public void enableRotation() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
     }
 
     @Override

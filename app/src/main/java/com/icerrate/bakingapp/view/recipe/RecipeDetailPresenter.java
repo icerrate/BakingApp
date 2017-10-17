@@ -1,4 +1,4 @@
-package com.icerrate.bakingapp.view.recipes.detail;
+package com.icerrate.bakingapp.view.recipe;
 
 import com.icerrate.bakingapp.data.model.Ingredient;
 import com.icerrate.bakingapp.data.model.Recipe;

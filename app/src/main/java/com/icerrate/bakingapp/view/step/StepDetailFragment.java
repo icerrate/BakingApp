@@ -1,6 +1,7 @@
 package com.icerrate.bakingapp.view.step;
 
 import android.annotation.SuppressLint;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -17,6 +18,10 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -39,6 +44,7 @@ import com.icerrate.bakingapp.R;
 import com.icerrate.bakingapp.data.model.Step;
 import com.icerrate.bakingapp.utils.MeasureUtils;
 import com.icerrate.bakingapp.view.common.BaseFragment;
+import com.icerrate.bakingapp.view.common.GlideApp;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -50,6 +56,13 @@ import butterknife.ButterKnife;
 public class StepDetailFragment extends BaseFragment implements StepDetailView, Player.EventListener, PlaybackControlView.VisibilityListener {
 
     public static String KEY_STEP_DETAIL = "STEP_DETAIL_KEY";
+
+    public static String KEY_VIDEO_TIME = "VIDEO_TIME_KEY";
+
+    public static String KEY_VIDEO_AUTOPLAY = "VIDEO_AUTOPLAY_KEY";
+
+    @BindView(R.id.video_container)
+    public RelativeLayout videoContainer;
 
     @BindView(R.id.video)
     public SimpleExoPlayerView videoExoPlayerView;
@@ -71,8 +84,6 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     private MediaSessionCompat mediaSession;
 
     private PlaybackStateCompat.Builder stateBuilder;
-
-    private boolean showDescription = true;
 
     private StepDetailPresenter presenter;
 
@@ -110,32 +121,56 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
         } else {
             restoreInstanceState(savedInstanceState);
         }
+        refreshViewRotation();
         presenter.loadStepDetail();
+    }
+
+    private void refreshViewRotation() {
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        switch (display.getRotation()) {
+            case Surface.ROTATION_90: case Surface.ROTATION_270:
+                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, display.getHeight());
+                videoExoPlayerView.setLayoutParams(layoutParams);
+                hideSystemUi();
+                if (presenter.containsVideo()) {
+                    fragmentListener.setToolbarVisibility(View.GONE);
+                    descriptionCardView.setVisibility(View.GONE);
+                } else {
+                    fragmentListener.setToolbarVisibility(View.VISIBLE);
+                    descriptionCardView.setVisibility(View.VISIBLE);
+                }
+                break;
+            default:
+                layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, MeasureUtils.dpToPx(250));
+                videoExoPlayerView.setLayoutParams(layoutParams);
+                showSystemUi();
+                fragmentListener.setToolbarVisibility(View.VISIBLE);
+                descriptionCardView.setVisibility(View.VISIBLE);
+                break;
+        }
     }
 
     @Override
     protected void saveInstanceState(Bundle outState) {
         outState.putParcelable(KEY_STEP_DETAIL, presenter.getStepDetail());
+        outState.putLong(KEY_VIDEO_TIME, presenter.getVideoTime());
+        outState.putBoolean(KEY_VIDEO_AUTOPLAY, presenter.getVideoAutoplay());
     }
 
     @Override
     protected void restoreInstanceState(Bundle savedState) {
         Step stepDetail = savedState.getParcelable(KEY_STEP_DETAIL);
-        presenter.loadPresenterState(stepDetail);
+        Long videoTime = savedState.getLong(KEY_VIDEO_TIME);
+        Boolean videoAutoplay = savedState.getBoolean(KEY_VIDEO_AUTOPLAY);
+        presenter.loadPresenterState(stepDetail, videoTime, videoAutoplay);
     }
 
     private void setupView() {
         videoExoPlayerView.setControllerVisibilityListener(this);
         videoExoPlayerView.requestFocus();
-        descriptionCardView.setVisibility(showDescription ? View.VISIBLE : View.GONE);
-        if (!showDescription) {
-            Display display = getActivity().getWindowManager().getDefaultDisplay();
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, display.getHeight());
-            videoExoPlayerView.setLayoutParams(layoutParams);
-        }
     }
 
-    private void initializeMediaSession() {
+    private void initializeMediaSession(Long videoTime, Boolean videoAutoplay) {
         mediaSession = new MediaSessionCompat(getContext(), "RecipeStepSinglePageFragment");
 
         mediaSession.setFlags(
@@ -149,7 +184,11 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
                         PlaybackStateCompat.ACTION_PAUSE |
                         PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
                         PlaybackStateCompat.ACTION_PLAY_PAUSE);
-
+        if (videoAutoplay) {
+            stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING, videoTime, 1f);
+        } else {
+            stateBuilder.setState(PlaybackStateCompat.STATE_STOPPED, videoTime, 1f);
+        }
         mediaSession.setPlaybackState(stateBuilder.build());
         mediaSession.setCallback(new MediaSessionCompat.Callback() {
             @Override
@@ -188,7 +227,7 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
         }
     }
 
-    private void releasePlayer() {
+    public void releasePlayer() {
         if (exoPlayer != null) {
             exoPlayer.stop();
             exoPlayer.release();
@@ -201,17 +240,9 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        if (Util.SDK_INT > 23) {
-            initializePlayer();
-        }
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
-        if ((Util.SDK_INT <= 23 || exoPlayer == null)) {
+        if (presenter.containsVideo() && (Util.SDK_INT <= 23)) {
             initializePlayer();
         }
     }
@@ -219,7 +250,7 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     @Override
     public void onPause() {
         super.onPause();
-        if (Util.SDK_INT <= 23) {
+        if (presenter.containsVideo() && Util.SDK_INT <= 23) {
             releasePlayer();
         }
     }
@@ -227,7 +258,7 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     @Override
     public void onStop() {
         super.onStop();
-        if (Util.SDK_INT > 23) {
+        if (presenter.containsVideo() && Util.SDK_INT > 23) {
             releasePlayer();
         }
     }
@@ -247,65 +278,40 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
         videoExoPlayerView.setSystemUiVisibility(View.VISIBLE);
     }
 
-    public void onConfigurationChanged() {
-        Display mDisplay = getActivity().getWindowManager().getDefaultDisplay();
-        switch (mDisplay.getRotation()) {
-            case Surface.ROTATION_90: case Surface.ROTATION_270:
-                showDescription = false;
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, mDisplay.getHeight());
-                videoExoPlayerView.setLayoutParams(layoutParams);
-                hideSystemUi();
-                fragmentListener.setToolbarVisibility(View.GONE);
-                descriptionCardView.setVisibility(View.GONE);
-                break;
-            default:
-                showDescription = true;
-                layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, MeasureUtils.dpToPx(250));
-                videoExoPlayerView.setLayoutParams(layoutParams);
-                showSystemUi();
-                fragmentListener.setToolbarVisibility(View.VISIBLE);
-                descriptionCardView.setVisibility(View.VISIBLE);
-                break;
-        }
-    }
+    @Override
+    public void loadThumbnailSource(String thumbnailUrl) {
+        GlideApp.with(getContext())
+                .load(thumbnailUrl)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        thumbnailImageView.setVisibility(View.GONE);
+                        return false;
+                    }
 
-    private void setLayout(int rotation) {
-        /*View view = null;
-        if (rotation == 2)
-            view = mInflater.inflate(R.layout.segment_dettaglio_evento_land, null);
-        else if (rotation == 1)
-            view = mInflater.inflate(R.layout.segment_dettaglio_evento, null);
-
-        if (rotation == 2 || rotation == 1) {
-            ViewGroup viewGroup = (ViewGroup) mRoot.findViewById(R.id.dettaglio_evento_root);
-            viewGroup.removeAllViews();
-            viewGroup.addView(view, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-            this.initComponent();
-        }*/
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        thumbnailImageView.setVisibility(View.VISIBLE);
+                        return false;
+                    }
+                })
+                .into(thumbnailImageView);
     }
 
     @Override
-    public void showThumbnail(String thumbnailUrl) {
-        thumbnailImageView.setVisibility(View.VISIBLE);
-        //TODO: Image
+    public void showThumbnail(boolean show) {
+        thumbnailImageView.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override
-    public void hideThumbnail() {
-        thumbnailImageView.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void showVideo(String videoUrl) {
-        videoExoPlayerView.setVisibility(View.VISIBLE);
-        //TODO: ExoPlayer
-        initializeMediaSession();
+    public void loadVideoSource(String videoUrl, Long videoTime, Boolean videoAutoplay) {
+        initializeMediaSession(videoTime, videoAutoplay);
         initializePlayer();
     }
 
     @Override
-    public void hideVideo() {
-        videoExoPlayerView.setVisibility(View.GONE);
+    public void showVideo(boolean show) {
+        videoContainer.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override
