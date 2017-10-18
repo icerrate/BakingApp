@@ -11,6 +11,8 @@ import java.util.ArrayList;
 
 public interface RecipeDetailView extends BaseView {
 
+    void showRecipeName(String recipeName);
+
     void showIngredients(String ingredients);
 
     void showSteps(ArrayList<Step> steps);

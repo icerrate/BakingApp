@@ -9,7 +9,8 @@
     <color name="loading_background">#30000000</color>
 
     <color name="fragment_background">#E9E9E9</color>
-    <color name="item_list_background">#e9e9e9</color>
+    <color name="item_list_background">#ededed</color>
+    <color name="selected_item_list_background">#bebebe</color>
     <color name="cardview_background">#FAFAFA</color>
 
     <color name="gray">#868686</color>

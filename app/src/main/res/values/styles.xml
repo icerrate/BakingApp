@@ -17,13 +17,6 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="AppTheme.AppBarTitle" parent="TextAppearance.AppCompat.Title">
-        <item name="android:layout_marginLeft">72dp</item>
-        <item name="android:layout_marginRight">40dp</item>
-        <item name="android:layout_marginTop">14dp</item>
-        <item name="android:layout_marginBottom">14dp</item>
-    </style>
-
     <style name="FlatButton" parent="Theme.AppCompat.Light">
         <item name="colorControlHighlight">@color/colorAccent</item>
     </style>
@@ -31,7 +24,7 @@
     <style name="SubTitleText">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:padding">16dp</item>
+        <item name="android:padding">@dimen/margin_normal</item>
         <item name="android:textColor">@color/colorAccent</item>
         <item name="android:textSize">16sp</item>
         <item name="android:gravity">center_vertical</item>

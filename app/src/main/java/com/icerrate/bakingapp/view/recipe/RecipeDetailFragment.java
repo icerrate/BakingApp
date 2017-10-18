@@ -12,16 +12,21 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.icerrate.bakingapp.R;
-import com.icerrate.bakingapp.data.model.Recipe;
+import com.icerrate.bakingapp.data.model.Ingredient;
 import com.icerrate.bakingapp.data.model.Step;
+import com.icerrate.bakingapp.utils.InjectionUtils;
 import com.icerrate.bakingapp.view.common.BaseFragment;
 import com.icerrate.bakingapp.view.common.VerticalSpaceItemDecoration;
-import com.icerrate.bakingapp.view.step.StepListAdapter;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.icerrate.bakingapp.R.id.ingredients;
+import static com.icerrate.bakingapp.R.id.steps;
+import static com.icerrate.bakingapp.view.recipe.RecipeDetailActivity.KEY_RECIPE_ID;
+import static com.icerrate.bakingapp.view.recipe.RecipeDetailActivity.KEY_SELECTED_STEP;
 
 /**
  * @author Ivan Cerrate.
@@ -29,12 +34,14 @@ import butterknife.ButterKnife;
 
 public class RecipeDetailFragment extends BaseFragment implements RecipeDetailView, StepListAdapter.OnItemClickListener {
 
-    public static String KEY_RECIPE_DETAIL = "RECIPE_DETAIL_KEY";
+    public static String KEY_INGREDIENTS = "INGREDIENTS_KEY";
 
-    @BindView(R.id.ingredients)
+    public static String KEY_STEPS = "STEPS_KEY";
+
+    @BindView(ingredients)
     public TextView ingredientsTextView;
 
-    @BindView(R.id.steps)
+    @BindView(steps)
     public RecyclerView stepsRecyclerView;
 
     @BindView(R.id.steps_no_data)
@@ -46,10 +53,13 @@ public class RecipeDetailFragment extends BaseFragment implements RecipeDetailVi
 
     private RecipeDetailActivityListener recipeDetailActivityListener;
 
-    public static RecipeDetailFragment newInstance(Recipe recipe) {
+    public static RecipeDetailFragment newInstance(Integer recipeId, Integer selectedStep) {
         Bundle bundle = new Bundle();
-        if (recipe != null) {
-            bundle.putParcelable(KEY_RECIPE_DETAIL, recipe);
+        if (recipeId != null) {
+            bundle.putInt(KEY_RECIPE_ID, recipeId);
+        }
+        if (recipeId != null) {
+            bundle.putInt(KEY_SELECTED_STEP, selectedStep);
         }
         RecipeDetailFragment fragment = new RecipeDetailFragment();
         fragment.setArguments(bundle);
@@ -59,7 +69,8 @@ public class RecipeDetailFragment extends BaseFragment implements RecipeDetailVi
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        presenter = new RecipeDetailPresenter(this);
+        presenter = new RecipeDetailPresenter(this,
+                InjectionUtils.recipeRepository(getContext()));
     }
 
     @Override
@@ -73,30 +84,41 @@ public class RecipeDetailFragment extends BaseFragment implements RecipeDetailVi
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setupView();
         if (savedInstanceState == null) {
-            Recipe recipeDetail = getArguments().getParcelable(KEY_RECIPE_DETAIL);
-            presenter.setRecipeDetail(recipeDetail);
+            Integer recipeId = getArguments().getInt(KEY_RECIPE_ID);
+            Integer selectedStep = getArguments().getInt(KEY_SELECTED_STEP);
+            presenter.setRecipeId(recipeId);
+            presenter.setSelectedStep(selectedStep);
         } else {
             restoreInstanceState(savedInstanceState);
         }
-        presenter.loadRecipeDetail();
+        setupView();
+        presenter.loadViewContent();
     }
 
     @Override
     protected void saveInstanceState(Bundle outState) {
-        outState.putParcelable(KEY_RECIPE_DETAIL, presenter.getRecipeDetail());
+        outState.putInt(KEY_RECIPE_ID, presenter.getRecipeId());
+        outState.putParcelableArrayList(KEY_INGREDIENTS, presenter.getIngredientsList());
+        outState.putParcelableArrayList(KEY_STEPS, presenter.getStepsList());
+        outState.putInt(KEY_SELECTED_STEP, presenter.getSelectedStep());
     }
 
     @Override
     protected void restoreInstanceState(Bundle savedState) {
-        Recipe recipeDetail = savedState.getParcelable(KEY_RECIPE_DETAIL);
-        presenter.loadPresenterState(recipeDetail);
+        Integer recipeId = savedState.getInt(KEY_RECIPE_ID);
+        ArrayList<Ingredient> ingredientsList = savedState.getParcelableArrayList(KEY_INGREDIENTS);
+        ArrayList<Step> stepsList = savedState.getParcelableArrayList(KEY_STEPS);
+        Integer selectedStep = savedState.getInt(KEY_SELECTED_STEP);
+        presenter.loadPresenterState(recipeId, ingredientsList, stepsList, selectedStep);
     }
 
     private void setupView() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         adapter = new StepListAdapter(this);
+        if(!getResources().getBoolean(R.bool.is_phone)){
+            adapter.setSelectedStep(presenter.getSelectedStep());
+        }
         stepsRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(8,4));
         stepsRecyclerView.setAdapter(adapter);
         stepsRecyclerView.setLayoutManager(linearLayoutManager);
@@ -104,10 +126,10 @@ public class RecipeDetailFragment extends BaseFragment implements RecipeDetailVi
     }
 
     @Override
-    public void onItemClick(View view) {
+    public void onItemClick(int index, View view) {
         Step step = (Step) view.getTag();
         if (step != null) {
-            presenter.onStepItemClick(step);
+            presenter.onStepItemClick(index, step);
         }
     }
 
@@ -129,6 +151,11 @@ public class RecipeDetailFragment extends BaseFragment implements RecipeDetailVi
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + " must implement RecipeDetailActivityListener");
         }
+    }
+
+    @Override
+    public void showRecipeName(String recipeName) {
+        fragmentListener.setTitle(recipeName);
     }
 
     @Override

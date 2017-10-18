@@ -1,4 +1,4 @@
-package com.icerrate.bakingapp.view.step;
+package com.icerrate.bakingapp.view.recipe;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,6 +20,8 @@ import butterknife.ButterKnife;
 
 public class StepListAdapter extends RecyclerView.Adapter<StepListAdapter.StepViewHolder> {
 
+    private int selectedPos = RecyclerView.NO_POSITION;
+
     private ArrayList<Step> data;
 
     private OnItemClickListener onItemClickListener;
@@ -33,6 +35,10 @@ public class StepListAdapter extends RecyclerView.Adapter<StepListAdapter.StepVi
         this.onItemClickListener = onItemClickListener;
     }
 
+    public void setSelectedStep(int selectedPos) {
+        this.selectedPos = selectedPos;
+    }
+
     @Override
     public StepViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_step, parent, false);
@@ -42,6 +48,7 @@ public class StepListAdapter extends RecyclerView.Adapter<StepListAdapter.StepVi
     @Override
     public void onBindViewHolder(StepViewHolder holder, int position) {
         Step step = data.get(position);
+        holder.itemView.setSelected(selectedPos == position);
         holder.descriptionTextView.setText(step.getShortDescription());
         holder.itemView.setTag(step);
     }
@@ -74,13 +81,17 @@ public class StepListAdapter extends RecyclerView.Adapter<StepListAdapter.StepVi
         @Override
         public void onClick(View view) {
             if (onItemClickListener != null) {
-                onItemClickListener.onItemClick(view);
+                onItemClickListener.onItemClick(getAdapterPosition(), view);
+                if (selectedPos == RecyclerView.NO_POSITION) return;
+                notifyItemChanged(selectedPos);
+                selectedPos = getAdapterPosition();
+                notifyItemChanged(selectedPos);
             }
         }
     }
 
     public interface OnItemClickListener {
 
-        void onItemClick(View view);
+        void onItemClick(int index, View view);
     }
 }

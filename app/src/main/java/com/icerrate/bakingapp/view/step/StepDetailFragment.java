@@ -36,12 +36,12 @@ import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
-import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.icerrate.bakingapp.R;
 import com.icerrate.bakingapp.data.model.Step;
+import com.icerrate.bakingapp.utils.InjectionUtils;
 import com.icerrate.bakingapp.utils.MeasureUtils;
 import com.icerrate.bakingapp.view.common.BaseFragment;
 import com.icerrate.bakingapp.view.common.GlideApp;
@@ -49,17 +49,16 @@ import com.icerrate.bakingapp.view.common.GlideApp;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.icerrate.bakingapp.view.recipe.RecipeDetailActivity.KEY_RECIPE_ID;
+import static com.icerrate.bakingapp.view.recipe.RecipeDetailActivity.KEY_SELECTED_STEP;
+
 /**
  * @author Ivan Cerrate.
  */
 
-public class StepDetailFragment extends BaseFragment implements StepDetailView, Player.EventListener, PlaybackControlView.VisibilityListener {
+public class StepDetailFragment extends BaseFragment implements StepDetailView, Player.EventListener {
 
     public static String KEY_STEP_DETAIL = "STEP_DETAIL_KEY";
-
-    public static String KEY_VIDEO_TIME = "VIDEO_TIME_KEY";
-
-    public static String KEY_VIDEO_AUTOPLAY = "VIDEO_AUTOPLAY_KEY";
 
     @BindView(R.id.video_container)
     public RelativeLayout videoContainer;
@@ -87,10 +86,13 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
 
     private StepDetailPresenter presenter;
 
-    public static StepDetailFragment newInstance(Step step) {
+    public static StepDetailFragment newInstance(Integer recipeId, Integer selectedStep) {
         Bundle bundle = new Bundle();
-        if (step != null) {
-            bundle.putParcelable(KEY_STEP_DETAIL, step);
+        if (recipeId != null) {
+            bundle.putInt(KEY_RECIPE_ID, recipeId);
+        }
+        if (selectedStep != null) {
+            bundle.putInt(KEY_SELECTED_STEP, selectedStep);
         }
         StepDetailFragment fragment = new StepDetailFragment();
         fragment.setArguments(bundle);
@@ -100,7 +102,8 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        presenter = new StepDetailPresenter(this);
+        presenter = new StepDetailPresenter(this,
+                InjectionUtils.recipeRepository(getContext()));
     }
 
     @Override
@@ -116,31 +119,35 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
         super.onActivityCreated(savedInstanceState);
         setupView();
         if (savedInstanceState == null) {
-            Step recipeDetail = getArguments().getParcelable(KEY_STEP_DETAIL);
-            presenter.setStepDetail(recipeDetail);
+            Integer recipeId = getArguments().getInt(KEY_RECIPE_ID);
+            Integer selectedStep = getArguments().getInt(KEY_SELECTED_STEP);
+            presenter.setRecipeId(recipeId);
+            presenter.setSelectedStep(selectedStep);
         } else {
             restoreInstanceState(savedInstanceState);
         }
-        refreshViewRotation();
         presenter.loadStepDetail();
+        refreshViewRotation();
     }
 
     private void refreshViewRotation() {
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         switch (display.getRotation()) {
-            case Surface.ROTATION_90: case Surface.ROTATION_270:
+            case Surface.ROTATION_90: case Surface.ROTATION_270: //Landscape
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, display.getHeight());
                 videoExoPlayerView.setLayoutParams(layoutParams);
-                hideSystemUi();
                 if (presenter.containsVideo()) {
-                    fragmentListener.setToolbarVisibility(View.GONE);
+                    if (getActivity() instanceof StepDetailActivity) {
+                        hideSystemUi();
+                        fragmentListener.setToolbarVisibility(View.GONE);
+                    }
                     descriptionCardView.setVisibility(View.GONE);
                 } else {
                     fragmentListener.setToolbarVisibility(View.VISIBLE);
                     descriptionCardView.setVisibility(View.VISIBLE);
                 }
                 break;
-            default:
+            default: // Portrait
                 layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, MeasureUtils.dpToPx(250));
                 videoExoPlayerView.setLayoutParams(layoutParams);
                 showSystemUi();
@@ -152,26 +159,25 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
 
     @Override
     protected void saveInstanceState(Bundle outState) {
+        outState.putInt(KEY_RECIPE_ID, presenter.getRecipeId());
+        outState.putInt(KEY_SELECTED_STEP, presenter.getSelectedStep());
         outState.putParcelable(KEY_STEP_DETAIL, presenter.getStepDetail());
-        outState.putLong(KEY_VIDEO_TIME, presenter.getVideoTime());
-        outState.putBoolean(KEY_VIDEO_AUTOPLAY, presenter.getVideoAutoplay());
     }
 
     @Override
     protected void restoreInstanceState(Bundle savedState) {
+        Integer recipeId = savedState.getInt(KEY_RECIPE_ID);
+        Integer selectedStep = savedState.getInt(KEY_SELECTED_STEP);
         Step stepDetail = savedState.getParcelable(KEY_STEP_DETAIL);
-        Long videoTime = savedState.getLong(KEY_VIDEO_TIME);
-        Boolean videoAutoplay = savedState.getBoolean(KEY_VIDEO_AUTOPLAY);
-        presenter.loadPresenterState(stepDetail, videoTime, videoAutoplay);
+        presenter.loadPresenterState(recipeId, selectedStep, stepDetail);
     }
 
     private void setupView() {
-        videoExoPlayerView.setControllerVisibilityListener(this);
         videoExoPlayerView.requestFocus();
     }
 
-    private void initializeMediaSession(Long videoTime, Boolean videoAutoplay) {
-        mediaSession = new MediaSessionCompat(getContext(), "RecipeStepSinglePageFragment");
+    private void initializeMediaSession() {
+        mediaSession = new MediaSessionCompat(getContext(), "StepVideo");
 
         mediaSession.setFlags(
                 MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
@@ -184,11 +190,6 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
                         PlaybackStateCompat.ACTION_PAUSE |
                         PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
                         PlaybackStateCompat.ACTION_PLAY_PAUSE);
-        if (videoAutoplay) {
-            stateBuilder.setState(PlaybackStateCompat.STATE_PLAYING, videoTime, 1f);
-        } else {
-            stateBuilder.setState(PlaybackStateCompat.STATE_STOPPED, videoTime, 1f);
-        }
         mediaSession.setPlaybackState(stateBuilder.build());
         mediaSession.setCallback(new MediaSessionCompat.Callback() {
             @Override
@@ -279,9 +280,17 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     }
 
     @Override
+    public void showShortDescription(String shortDescription) {
+        if (getActivity() instanceof StepDetailActivity) {
+            fragmentListener.setTitle(shortDescription);
+        }
+    }
+
+    @Override
     public void loadThumbnailSource(String thumbnailUrl) {
         GlideApp.with(getContext())
                 .load(thumbnailUrl)
+                .placeholder(R.drawable.rectangle_placeholder)
                 .listener(new RequestListener<Drawable>() {
                     @Override
                     public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -304,8 +313,8 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     }
 
     @Override
-    public void loadVideoSource(String videoUrl, Long videoTime, Boolean videoAutoplay) {
-        initializeMediaSession(videoTime, videoAutoplay);
+    public void loadVideoSource(String videoUrl) {
+        initializeMediaSession();
         initializePlayer();
     }
 
@@ -370,10 +379,5 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     @Override
     public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
         //Needs to be empty
-    }
-
-    @Override
-    public void onVisibilityChange(int visibility) {
-
     }
 }

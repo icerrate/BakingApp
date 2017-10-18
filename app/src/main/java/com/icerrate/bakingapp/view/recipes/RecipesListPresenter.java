@@ -1,7 +1,7 @@
 package com.icerrate.bakingapp.view.recipes;
 
 import com.icerrate.bakingapp.data.model.Recipe;
-import com.icerrate.bakingapp.data.source.RecipeRepository;
+import com.icerrate.bakingapp.data.source.BakingAppRepository;
 import com.icerrate.bakingapp.view.common.BaseCallback;
 import com.icerrate.bakingapp.view.common.BasePresenter;
 
@@ -15,9 +15,9 @@ public class RecipesListPresenter extends BasePresenter<RecipesListView> {
 
     private ArrayList<Recipe> recipesList;
 
-    private RecipeRepository recipeRepository;
+    private BakingAppRepository recipeRepository;
 
-    public RecipesListPresenter(RecipesListView view, RecipeRepository recipeRepository) {
+    public RecipesListPresenter(RecipesListView view, BakingAppRepository recipeRepository) {
         super(view);
         this.recipeRepository = recipeRepository;
     }

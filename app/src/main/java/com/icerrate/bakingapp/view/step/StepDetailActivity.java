@@ -5,42 +5,32 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.icerrate.bakingapp.R;
-import com.icerrate.bakingapp.data.model.Step;
 import com.icerrate.bakingapp.view.common.BaseActivity;
+
+import static com.icerrate.bakingapp.view.recipe.RecipeDetailActivity.KEY_RECIPE_ID;
+import static com.icerrate.bakingapp.view.recipe.RecipeDetailActivity.KEY_SELECTED_STEP;
 
 public class StepDetailActivity extends BaseActivity {
 
-    private Step stepDetail;
-
-    public static Intent makeIntent(Context context) {
-        return new Intent(context, StepDetailActivity.class);
+    public static Intent makeIntent(Context context, Integer recipeId, Integer selectedStep) {
+        return new Intent(context, StepDetailActivity.class)
+                .putExtra(KEY_RECIPE_ID, recipeId)
+                .putExtra(KEY_SELECTED_STEP, selectedStep);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_step_detail);
+        setContentView(R.layout.activity_base);
         setNavigationToolbar(true);
         enableRotation();
         if (savedInstanceState == null) {
-            stepDetail = getIntent().getParcelableExtra(StepDetailFragment.KEY_STEP_DETAIL);
-            setTitle(stepDetail.getShortDescription());
-            StepDetailFragment stepDetailFragment = StepDetailFragment.newInstance(stepDetail);
+            Integer recipeId = getIntent().getIntExtra(KEY_RECIPE_ID, -1);
+            Integer selectedStep = getIntent().getIntExtra(KEY_SELECTED_STEP, -1);
+            StepDetailFragment stepDetailFragment = StepDetailFragment.newInstance(recipeId, selectedStep);
             replaceFragment(R.id.content, stepDetailFragment);
         } else {
             onRestoreInstanceState(savedInstanceState);
         }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable(StepDetailFragment.KEY_STEP_DETAIL, stepDetail);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        stepDetail = savedInstanceState.getParcelable(StepDetailFragment.KEY_STEP_DETAIL);
     }
 }

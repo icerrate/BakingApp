@@ -8,11 +8,13 @@ import com.icerrate.bakingapp.view.common.BaseView;
 
 public interface StepDetailView extends BaseView {
 
+    void showShortDescription(String shortDescription);
+
     void loadThumbnailSource(String thumbnailUrl);
 
     void showThumbnail(boolean show);
 
-    void loadVideoSource(String videoUrl, Long videoTime, Boolean videoAutoplay);
+    void loadVideoSource(String videoUrl);
 
     void showVideo(boolean show);
 

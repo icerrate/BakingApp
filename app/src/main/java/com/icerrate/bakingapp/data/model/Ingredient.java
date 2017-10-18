@@ -16,6 +16,18 @@ public class Ingredient implements Parcelable {
     public Ingredient() {
     }
 
+    public void setQuantity(Double quantity) {
+        this.quantity = quantity;
+    }
+
+    public void setMeasure(String measure) {
+        this.measure = measure;
+    }
+
+    public void setIngredient(String ingredient) {
+        this.ingredient = ingredient;
+    }
+
     public Double getQuantity() {
         return quantity;
     }

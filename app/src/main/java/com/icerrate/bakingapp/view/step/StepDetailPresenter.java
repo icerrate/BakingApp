@@ -2,6 +2,8 @@ package com.icerrate.bakingapp.view.step;
 
 import com.icerrate.bakingapp.R;
 import com.icerrate.bakingapp.data.model.Step;
+import com.icerrate.bakingapp.data.source.BakingAppRepository;
+import com.icerrate.bakingapp.view.common.BaseCallback;
 import com.icerrate.bakingapp.view.common.BasePresenter;
 
 /**
@@ -10,34 +12,60 @@ import com.icerrate.bakingapp.view.common.BasePresenter;
 
 public class StepDetailPresenter extends BasePresenter<StepDetailView> {
 
+    private Integer recipeId;
+
+    private Integer selectedStep;
+
     private Step stepDetail;
 
-    private Long videoTime = 3L;
+    private BakingAppRepository recipeRepository;
 
-    private Boolean videoAutoplay = false;
-
-    public StepDetailPresenter(StepDetailView view) {
+    public StepDetailPresenter(StepDetailView view, BakingAppRepository recipeRepository) {
         super(view);
+        this.recipeRepository = recipeRepository;
     }
 
     public void loadStepDetail() {
-        if (stepDetail != null) {
-            showMediaResource(stepDetail.getThumbnailURL(), stepDetail.getVideoURL());
-            showDescription(stepDetail.getDescription());
+        if (stepDetail == null) {
+            getInternalStepDetail(recipeId, selectedStep);
+        } else {
+            showStepDetail(stepDetail);
         }
     }
 
-    private void showMediaResource(String thumbnailUrl, String videoUrl) {
+    private void getInternalStepDetail(Integer recipeId, Integer selectedStep) {
+        view.showProgressBar(true);
+        recipeRepository.getStepDetail(recipeId, selectedStep, new BaseCallback<Step>() {
+            @Override
+            public void onSuccess(Step response) {
+                stepDetail = response;
+                showStepDetail(response);
+                view.showProgressBar(false);
+            }
+
+            @Override
+            public void onFailure(String errorMessage) {
+                view.showError(errorMessage);
+                view.showProgressBar(false);
+            }
+        });
+    }
+
+    private void showStepDetail(Step stepDetail) {
+        //Short Description
+        view.showShortDescription(stepDetail.getShortDescription());
+        //Media
+        String thumbnailUrl = stepDetail.getThumbnailURL();
+        String videoUrl = stepDetail.getVideoURL();
         if (thumbnailUrl != null && !thumbnailUrl.isEmpty()) {
             view.showThumbnail(true);
             view.loadThumbnailSource(thumbnailUrl);
         } else if (videoUrl != null && !videoUrl.isEmpty()) {
             view.showVideo(true);
-            view.loadVideoSource(videoUrl, videoTime, videoAutoplay);
+            view.loadVideoSource(videoUrl);
         }
-    }
-
-    private void showDescription(String description) {
+        //Description
+        String description = stepDetail.getDescription();
         if (description != null && !description.isEmpty()) {
             view.showDescription(description);
         } else {
@@ -49,23 +77,33 @@ public class StepDetailPresenter extends BasePresenter<StepDetailView> {
         return stepDetail.getVideoURL() != null && !stepDetail.getVideoURL().isEmpty();
     }
 
-    public void setStepDetail(Step stepDetail) {
-        this.stepDetail = stepDetail;
+    public Integer getRecipeId() {
+        return recipeId;
+    }
+
+    public void setRecipeId(Integer recipeId) {
+        this.recipeId = recipeId;
+    }
+
+    public Integer getSelectedStep() {
+        return selectedStep;
+    }
+
+    public void setSelectedStep(Integer selectedStep) {
+        this.selectedStep = selectedStep;
     }
 
     public Step getStepDetail() {
         return stepDetail;
     }
-    public Long getVideoTime() {
-        return videoTime;
-    }
-    public Boolean getVideoAutoplay() {
-        return videoAutoplay;
+
+    public void setStepDetail(Step stepDetail) {
+        this.stepDetail = stepDetail;
     }
 
-    public void loadPresenterState(Step stepDetail, Long videoTime, Boolean videoAutoplay) {
+    public void loadPresenterState(Integer recipeId, Integer selectedStep, Step stepDetail) {
+        this.recipeId = recipeId;
+        this.selectedStep = selectedStep;
         this.stepDetail = stepDetail;
-        this.videoTime = videoTime;
-        this.videoAutoplay = videoAutoplay;
     }
 }

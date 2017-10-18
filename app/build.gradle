@@ -45,5 +45,8 @@ dependencies {
     compile 'com.google.android.exoplayer:exoplayer-core:r2.5.3'
     compile 'com.google.android.exoplayer:exoplayer-ui:r2.5.3'
 
+    compile 'com.j256.ormlite:ormlite-core:5.0'
+    compile 'com.j256.ormlite:ormlite-android:5.0'
+
     testCompile 'junit:junit:4.12'
 }

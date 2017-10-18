@@ -56,6 +56,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
         holder.descriptionTextView.setText(description);
         GlideApp.with(context)
                 .load(recipe.getImage())
+                .placeholder(R.drawable.square_placeholder)
                 .into(holder.photoImageView);
         holder.viewButton.setTag(recipe);
     }
@@ -84,9 +85,6 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
 
         @BindView(R.id.view_action)
         public Button viewButton;
-
-        @BindView(R.id.share_action)
-        public Button shareButton;
 
         private OnItemClickListener onItemClickListener;
 

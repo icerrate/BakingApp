@@ -2,7 +2,11 @@
 <resources>
     <dimen name="progress_size">60dp</dimen>
 
-    <dimen name="dimen4">4dp</dimen>
-    <dimen name="dimen8">8dp</dimen>
-    <dimen name="dimen16">16dp</dimen>
+    <dimen name="square_photo">80dp</dimen>
+    <dimen name="rectangle_media_resource">250dp</dimen>
+
+    <dimen name="margin_xsmall">4dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_normal">16dp</dimen>
+    <dimen name="margin_large">24dp</dimen>
 </resources>

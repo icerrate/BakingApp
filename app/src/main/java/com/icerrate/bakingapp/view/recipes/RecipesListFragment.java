@@ -17,7 +17,6 @@ import com.icerrate.bakingapp.utils.InjectionUtils;
 import com.icerrate.bakingapp.view.common.BaseFragment;
 import com.icerrate.bakingapp.view.common.VerticalSpaceItemDecoration;
 import com.icerrate.bakingapp.view.recipe.RecipeDetailActivity;
-import com.icerrate.bakingapp.view.recipe.RecipeDetailFragment;
 
 import java.util.ArrayList;
 
@@ -50,7 +49,7 @@ public class RecipesListFragment extends BaseFragment implements RecipesListView
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         presenter = new RecipesListPresenter(this,
-                InjectionUtils.recipeRepository());
+                InjectionUtils.recipeRepository(getContext()));
     }
 
     @Override
@@ -92,10 +91,11 @@ public class RecipesListFragment extends BaseFragment implements RecipesListView
 
     private int getColumns() {
         Display display = getActivity().getWindowManager().getDefaultDisplay();
-        if (display.getRotation() == Surface.ROTATION_0) {
-            return 1;
-        } else {
-            return 3;
+        switch (display.getRotation()) {
+            case Surface.ROTATION_90: case Surface.ROTATION_270:
+                return 3;
+            default:
+                return 1;
         }
     }
 
@@ -119,7 +119,6 @@ public class RecipesListFragment extends BaseFragment implements RecipesListView
 
     @Override
     public void goToRecipeDetail(Recipe recipe) {
-        startActivity(RecipeDetailActivity.makeIntent(getContext())
-                .putExtra(RecipeDetailFragment.KEY_RECIPE_DETAIL, recipe));
+        startActivity(RecipeDetailActivity.makeIntent(getContext(), recipe.getId()));
     }
 }
