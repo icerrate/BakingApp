@@ -58,6 +58,10 @@ import static com.icerrate.bakingapp.view.recipe.RecipeDetailActivity.KEY_SELECT
 
 public class StepDetailFragment extends BaseFragment implements StepDetailView, Player.EventListener {
 
+    public static String KEY_VIDEO_TIME = "VIDEO_TIME_KEY";
+
+    public static String KEY_VIDEO_AUTO_PLAY = "VIDEO_AUTO_PLAY_KEY";
+
     public static String KEY_STEP_DETAIL = "STEP_DETAIL_KEY";
 
     @BindView(R.id.video_container)
@@ -162,6 +166,8 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
         outState.putInt(KEY_RECIPE_ID, presenter.getRecipeId());
         outState.putInt(KEY_SELECTED_STEP, presenter.getSelectedStep());
         outState.putParcelable(KEY_STEP_DETAIL, presenter.getStepDetail());
+        outState.putLong(KEY_VIDEO_TIME, presenter.getVideoTime());
+        outState.putBoolean(KEY_VIDEO_AUTO_PLAY, presenter.getVideoAutoPlay());
     }
 
     @Override
@@ -169,7 +175,9 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
         Integer recipeId = savedState.getInt(KEY_RECIPE_ID);
         Integer selectedStep = savedState.getInt(KEY_SELECTED_STEP);
         Step stepDetail = savedState.getParcelable(KEY_STEP_DETAIL);
-        presenter.loadPresenterState(recipeId, selectedStep, stepDetail);
+        Long videoTime = savedState.getLong(KEY_VIDEO_TIME);
+        Boolean videoAutoPlay = savedState.getBoolean(KEY_VIDEO_AUTO_PLAY);
+        presenter.loadPresenterState(recipeId, selectedStep, stepDetail, videoTime, videoAutoPlay);
     }
 
     private void setupView() {
@@ -210,7 +218,7 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
         mediaSession.setActive(true);
     }
 
-    private void initializePlayer() {
+    private void initializePlayer(long videoTime, boolean videoAutoPlay) {
         if (exoPlayer == null) {
             exoPlayer = ExoPlayerFactory.newSimpleInstance(
                     new DefaultRenderersFactory(getContext()),
@@ -224,11 +232,14 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     getContext(), userAgent), new DefaultExtractorsFactory(), null, null);
             exoPlayer.prepare(mediaSource);
-            exoPlayer.setPlayWhenReady(true);
+            exoPlayer.seekTo(videoTime);
+            exoPlayer.setPlayWhenReady(videoAutoPlay);
         }
     }
 
     public void releasePlayer() {
+        presenter.setVideoTime(exoPlayer.getCurrentPosition());
+        presenter.setVideoAutoPlay(exoPlayer.getPlayWhenReady());
         if (exoPlayer != null) {
             exoPlayer.stop();
             exoPlayer.release();
@@ -243,25 +254,13 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     @Override
     public void onResume() {
         super.onResume();
-        if (presenter.containsVideo() && (Util.SDK_INT <= 23)) {
-            initializePlayer();
-        }
+        initializePlayer(presenter.getVideoTime(), presenter.getVideoAutoPlay());
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (presenter.containsVideo() && Util.SDK_INT <= 23) {
-            releasePlayer();
-        }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (presenter.containsVideo() && Util.SDK_INT > 23) {
-            releasePlayer();
-        }
+        releasePlayer();
     }
 
     @SuppressLint("InlinedApi")
@@ -313,9 +312,9 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     }
 
     @Override
-    public void loadVideoSource(String videoUrl) {
+    public void loadVideoSource(String videoUrl, long videoTime, boolean videoAutoPlay) {
         initializeMediaSession();
-        initializePlayer();
+        initializePlayer(videoTime, videoAutoPlay);
     }
 
     @Override

@@ -14,7 +14,7 @@ public interface StepDetailView extends BaseView {
 
     void showThumbnail(boolean show);
 
-    void loadVideoSource(String videoUrl);
+    void loadVideoSource(String videoUrl, long videoTime, boolean videoAutoPlay);
 
     void showVideo(boolean show);
 

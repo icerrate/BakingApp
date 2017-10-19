@@ -18,6 +18,10 @@ public class StepDetailPresenter extends BasePresenter<StepDetailView> {
 
     private Step stepDetail;
 
+    private long videoTime = 0;
+
+    private boolean videoAutoPlay = true;
+
     private BakingAppRepository recipeRepository;
 
     public StepDetailPresenter(StepDetailView view, BakingAppRepository recipeRepository) {
@@ -62,7 +66,7 @@ public class StepDetailPresenter extends BasePresenter<StepDetailView> {
             view.loadThumbnailSource(thumbnailUrl);
         } else if (videoUrl != null && !videoUrl.isEmpty()) {
             view.showVideo(true);
-            view.loadVideoSource(videoUrl);
+            view.loadVideoSource(videoUrl, videoTime, videoAutoPlay);
         }
         //Description
         String description = stepDetail.getDescription();
@@ -101,9 +105,27 @@ public class StepDetailPresenter extends BasePresenter<StepDetailView> {
         this.stepDetail = stepDetail;
     }
 
-    public void loadPresenterState(Integer recipeId, Integer selectedStep, Step stepDetail) {
+    public Long getVideoTime() {
+        return videoTime;
+    }
+
+    public void setVideoTime(Long videoTime) {
+        this.videoTime = videoTime;
+    }
+
+    public Boolean getVideoAutoPlay() {
+        return videoAutoPlay;
+    }
+
+    public void setVideoAutoPlay(Boolean videoAutoPlay) {
+        this.videoAutoPlay = videoAutoPlay;
+    }
+
+    public void loadPresenterState(Integer recipeId, Integer selectedStep, Step stepDetail, Long videoTime, Boolean videoAutoPLay) {
         this.recipeId = recipeId;
         this.selectedStep = selectedStep;
         this.stepDetail = stepDetail;
+        this.videoTime = videoTime;
+        this.videoAutoPlay = videoAutoPLay;
     }
 }
