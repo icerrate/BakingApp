@@ -3,8 +3,19 @@
 Project for Udacity - Associate Android Developer Fast Track Nanodegree.
 
 ## Screenshots
+### PHONE
+![](https://github.com/icerrate/BakingApp/blob/master/art/p_01.png) __
+![](https://github.com/icerrate/BakingApp/blob/master/art/p_02.png)
 
-Coming Soon
+![](https://github.com/icerrate/BakingApp/blob/master/art/p_03.png) __
+![](https://github.com/icerrate/BakingApp/blob/master/art/p_04.png)
+
+![](https://github.com/icerrate/BakingApp/blob/master/art/p_05.png)
+
+### TABLET
+![](https://github.com/icerrate/BakingApp/blob/master/art/t_01.png)
+![](https://github.com/icerrate/BakingApp/blob/master/art/t_02.png)
+![](https://github.com/icerrate/BakingApp/blob/master/art/t_03.png)
 
 ## Author
 
