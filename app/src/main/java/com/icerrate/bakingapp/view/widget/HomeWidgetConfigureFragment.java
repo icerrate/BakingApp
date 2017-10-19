@@ -23,7 +23,9 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
+import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 /**
@@ -65,7 +67,7 @@ public class HomeWidgetConfigureFragment extends BaseFragment implements HomeWid
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        View view = inflater.inflate(R.layout.fragment_recipes_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_home_widget_configure, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
@@ -101,6 +103,14 @@ public class HomeWidgetConfigureFragment extends BaseFragment implements HomeWid
         recipesRecyclerView.addItemDecoration(new SimpleDividerItemDecoration(getResources().getDrawable(R.drawable.line_divider)));
         recipesRecyclerView.setAdapter(adapter);
         recipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+    }
+
+    @OnClick(R.id.cancel)
+    public void cancelButtonClicked() {
+        Intent resultValue = new Intent();
+        getActivity().sendBroadcast(resultValue);
+        fragmentListener.setActivityResult(RESULT_CANCELED, resultValue);
+        fragmentListener.closeActivity();
     }
 
     @Override

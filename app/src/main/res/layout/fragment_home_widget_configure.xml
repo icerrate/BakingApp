@@ -36,7 +36,7 @@
         android:id="@+id/cancel"
         style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?android:attr/listPreferredItemHeight"
         android:text="@string/action_cancel"
         android:textColor="@color/colorAccent"
         android:background="?android:selectableItemBackground"
