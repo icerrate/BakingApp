@@ -15,4 +15,5 @@
 
     <color name="soft_gray">#dedede</color>
     <color name="gray">#868686</color>
+    <color name="dark_gray">#505050</color>
 </resources>

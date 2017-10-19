@@ -116,7 +116,7 @@ public class RecipeDetailFragment extends BaseFragment implements RecipeDetailVi
     private void setupView() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         adapter = new StepListAdapter(this);
-        if(isPhone){
+        if(!isPhone){
             adapter.setSelectedStep(presenter.getSelectedStep());
         }
         stepsRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(8,4));
