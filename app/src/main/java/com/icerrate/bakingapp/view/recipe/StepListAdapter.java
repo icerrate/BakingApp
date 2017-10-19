@@ -22,7 +22,7 @@ public class StepListAdapter extends RecyclerView.Adapter<StepListAdapter.StepVi
 
     private int selectedPos = RecyclerView.NO_POSITION;
 
-    private ArrayList<Step> data;
+    private ArrayList<Step> stepsList;
 
     private OnItemClickListener onItemClickListener;
 
@@ -31,7 +31,7 @@ public class StepListAdapter extends RecyclerView.Adapter<StepListAdapter.StepVi
     }
 
     public StepListAdapter(ArrayList<Step> steps, OnItemClickListener onItemClickListener) {
-        this.data = steps;
+        this.stepsList = steps;
         this.onItemClickListener = onItemClickListener;
     }
 
@@ -47,7 +47,7 @@ public class StepListAdapter extends RecyclerView.Adapter<StepListAdapter.StepVi
 
     @Override
     public void onBindViewHolder(StepViewHolder holder, int position) {
-        Step step = data.get(position);
+        Step step = stepsList.get(position);
         holder.itemView.setSelected(selectedPos == position);
         holder.descriptionTextView.setText(step.getShortDescription());
         holder.itemView.setTag(step);
@@ -55,12 +55,12 @@ public class StepListAdapter extends RecyclerView.Adapter<StepListAdapter.StepVi
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return stepsList.size();
     }
 
     public void addItems(ArrayList<Step> items) {
-        this.data.clear();
-        this.data.addAll(items);
+        this.stepsList.clear();
+        this.stepsList.addAll(items);
         notifyDataSetChanged();
     }
 

@@ -33,11 +33,30 @@ public class Ingredient implements Parcelable {
     }
 
     public String getMeasure() {
-        return measure;
+        switch(measure){
+            case "CUP":
+                return quantity > 1 ? "cups" : "cup";
+            case "G":
+                return quantity > 1 ? "grams" : "gram";
+            case "K":
+                return quantity > 1 ? "kilos" : "kilo";
+            case "OZ":
+                return quantity > 1 ? "ounces" : "ounce";
+            case "TBLSP":
+                return quantity > 1 ? "tablespoons" : "tablespoon";
+            case "TSP":
+                return quantity > 1 ? "teaspoons" : "teaspoon";
+            case "UNIT":
+                return quantity > 1 ? "units" : "unit";
+            default:
+                return measure;
+        }
     }
 
     public String getIngredient() {
-        return ingredient;
+        String stylishIngredient = Character.toUpperCase(
+                ingredient.charAt(0)) + ingredient.substring(1);
+        return stylishIngredient;
     }
 
     public Ingredient(Parcel in) {

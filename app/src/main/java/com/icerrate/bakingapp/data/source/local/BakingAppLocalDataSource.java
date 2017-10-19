@@ -23,17 +23,17 @@ import static com.icerrate.bakingapp.provider.db.BakingAppContract.Step.STEP_ID;
  * @author Ivan Cerrate.
  */
 
-public class BakinAppLocalDataSource extends BaseService implements BakingAppDataSource {
+public class BakingAppLocalDataSource extends BaseService implements BakingAppDataSource {
 
     private Context context;
 
     private SQLiteDatabase database;
 
-    public BakinAppLocalDataSource(Context context) {
+    public BakingAppLocalDataSource(Context context) {
         this.context = context;
     }
 
-    private BakinAppLocalDataSource open() throws SQLException {
+    private BakingAppLocalDataSource open() throws SQLException {
         BakingAppDBHelper dbHelper = new BakingAppDBHelper(context);
         database = dbHelper.getWritableDatabase();
         return this;

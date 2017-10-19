@@ -11,7 +11,8 @@
     <color name="fragment_background">#E9E9E9</color>
     <color name="item_list_background">#ededed</color>
     <color name="selected_item_list_background">#bebebe</color>
-    <color name="cardview_background">#FAFAFA</color>
+    <color name="card_background">#FAFAFA</color>
 
+    <color name="soft_gray">#dedede</color>
     <color name="gray">#868686</color>
 </resources>

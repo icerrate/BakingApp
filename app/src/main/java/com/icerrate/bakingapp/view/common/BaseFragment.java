@@ -12,6 +12,7 @@ import android.view.ViewStub;
 import com.icerrate.bakingapp.R;
 import com.icerrate.bakingapp.utils.DialogUtils;
 
+import butterknife.BindBool;
 import butterknife.BindView;
 
 /**
@@ -19,6 +20,9 @@ import butterknife.BindView;
  */
 
 public abstract class BaseFragment extends Fragment implements BaseView {
+
+    @BindBool(R.bool.is_phone)
+    protected boolean isPhone;
 
     @Nullable
     @BindView(R.id.progress)

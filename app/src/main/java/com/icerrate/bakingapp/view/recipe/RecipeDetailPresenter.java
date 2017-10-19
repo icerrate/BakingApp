@@ -107,7 +107,7 @@ public class RecipeDetailPresenter extends BasePresenter<RecipeDetailView> {
             String stringIngredients = "";
             for (int i=0; i<ingredients.size(); i++) {
                 Ingredient ingredient = ingredients.get(i);
-                String line = "-" + ingredient.getQuantity() + " " + ingredient.getMeasure() + " " + ingredient.getIngredient();
+                String line = ingredient.getQuantity() + " " + ingredient.getMeasure() + " " + ingredient.getIngredient();
                 if (i < ingredients.size()-1) {
                     line = line + "\n";
                 }

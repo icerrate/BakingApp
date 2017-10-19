@@ -103,7 +103,7 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         presenter = new StepDetailPresenter(this,
-                InjectionUtils.recipeRepository(getContext()));
+                InjectionUtils.bakingRepository(getContext()));
     }
 
     @Override

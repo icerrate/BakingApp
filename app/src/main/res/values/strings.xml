@@ -15,6 +15,7 @@
     <!-- Recipe Detail -->
     <string name="title_activity_recipe_detail">Recipe Detail</string>
     <string name="subtitle_ingredients">Ingredients</string>
+    <string name="ingredients_no_data">No Ingredients Found</string>
     <string name="subtitle_steps">Steps</string>
     <string name="steps_no_data">No Steps Found</string>
 
@@ -22,4 +23,8 @@
     <string name="title_activity_step_detail">Step Detail</string>
     <string name="subtitle_description">Description</string>
     <string name="description_no_data">No Description Found</string>
+
+    <!-- Home Widget -->
+    <string name="title_activity_home_widget_configure">Choose Recipe</string>
+    <string name="action_cancel">Cancel</string>
 </resources>

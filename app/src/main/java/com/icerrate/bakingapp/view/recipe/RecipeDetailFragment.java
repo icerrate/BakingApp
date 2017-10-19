@@ -70,7 +70,7 @@ public class RecipeDetailFragment extends BaseFragment implements RecipeDetailVi
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         presenter = new RecipeDetailPresenter(this,
-                InjectionUtils.recipeRepository(getContext()));
+                InjectionUtils.bakingRepository(getContext()));
     }
 
     @Override
@@ -116,7 +116,7 @@ public class RecipeDetailFragment extends BaseFragment implements RecipeDetailVi
     private void setupView() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         adapter = new StepListAdapter(this);
-        if(!getResources().getBoolean(R.bool.is_phone)){
+        if(isPhone){
             adapter.setSelectedStep(presenter.getSelectedStep());
         }
         stepsRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(8,4));

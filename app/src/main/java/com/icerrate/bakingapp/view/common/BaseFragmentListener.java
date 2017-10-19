@@ -1,5 +1,6 @@
 package com.icerrate.bakingapp.view.common;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 
 /**
@@ -17,5 +18,9 @@ public interface BaseFragmentListener {
     void setTitle(String title);
 
     void setToolbarVisibility(int visibility);
+
+    void setActivityResult(int resultCode, Intent resultIntent);
+
+    void closeActivity();
 
 }

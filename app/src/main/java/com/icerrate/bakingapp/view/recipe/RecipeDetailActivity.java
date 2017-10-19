@@ -30,7 +30,7 @@ public class RecipeDetailActivity extends BaseActivity implements RecipeDetailAc
         setNavigationToolbar(true);
         if (savedInstanceState == null) {
             recipeId = getIntent().getIntExtra(KEY_RECIPE_ID, 0);
-            if(getResources().getBoolean(R.bool.is_phone)) {
+            if(isPhone) {
                 RecipeDetailFragment recipeDetailFragment = RecipeDetailFragment.newInstance(recipeId, -1);
                 replaceFragment(R.id.content, recipeDetailFragment);
             } else {
@@ -58,7 +58,7 @@ public class RecipeDetailActivity extends BaseActivity implements RecipeDetailAc
 
     @Override
     public void onRecipeStepSelected(Step step) {
-        if(getResources().getBoolean(R.bool.is_phone)){
+        if(isPhone){
             startActivity(StepDetailActivity.makeIntent(this, recipeId, step.getId()));
         } else {
             StepDetailFragment stepDetailFragment = (StepDetailFragment) getSupportFragmentManager().findFragmentById(R.id.sub_content);

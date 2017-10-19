@@ -1,5 +1,6 @@
 package com.icerrate.bakingapp.view.common;
 
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.support.annotation.LayoutRes;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.view.MenuItem;
 
 import com.icerrate.bakingapp.R;
 
+import butterknife.BindBool;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
@@ -19,7 +21,11 @@ import butterknife.Unbinder;
 
 public abstract class BaseActivity extends AppCompatActivity implements BaseFragmentListener {
 
+    @BindBool(R.bool.is_phone)
+    protected boolean isPhone;
+
     private Unbinder unbinder;
+
     protected Toolbar toolbar;
 
     @Override
@@ -28,7 +34,7 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
         unbinder = ButterKnife.bind(this);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if(getResources().getBoolean(R.bool.is_phone)){
+        if(isPhone){
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
     }
@@ -79,5 +85,15 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
         if (toolbar != null) {
             toolbar.setVisibility(visibility);
         }
+    }
+
+    @Override
+    public void setActivityResult(int resultCode, Intent resultIntent) {
+        setResult(resultCode, resultIntent);
+    }
+
+    @Override
+    public void closeActivity() {
+        finish();
     }
 }

@@ -24,7 +24,7 @@ import butterknife.ButterKnife;
 
 public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.RecipeViewHolder> {
 
-    private ArrayList<Recipe> data;
+    private ArrayList<Recipe> recipesList;
 
     private OnItemClickListener onItemClickListener;
 
@@ -33,7 +33,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
     }
 
     public RecipesListAdapter(ArrayList<Recipe> recipes, OnItemClickListener onItemClickListener) {
-        this.data = recipes;
+        this.recipesList = recipes;
         this.onItemClickListener = onItemClickListener;
     }
 
@@ -45,7 +45,7 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
 
     @Override
     public void onBindViewHolder(RecipeViewHolder holder, int position) {
-        Recipe recipe = data.get(position);
+        Recipe recipe = recipesList.get(position);
         Context context = holder.itemView.getContext();
 
         holder.titleTextView.setText(recipe.getName());
@@ -63,12 +63,12 @@ public class RecipesListAdapter extends RecyclerView.Adapter<RecipesListAdapter.
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return recipesList.size();
     }
 
     public void addItems(ArrayList<Recipe> items) {
-        this.data.clear();
-        this.data.addAll(items);
+        this.recipesList.clear();
+        this.recipesList.addAll(items);
         notifyDataSetChanged();
     }
 

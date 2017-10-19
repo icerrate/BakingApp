@@ -13,7 +13,6 @@ public class RecipesListActivity extends BaseActivity {
         setContentView(R.layout.activity_base);
         setNavigationToolbar(true);
         setTitle(getString(R.string.title_activity_recipes));
-        setNavigationToolbar(false);
         if (savedInstanceState == null) {
             RecipesListFragment recipesListFragment = RecipesListFragment.newInstance();
             replaceFragment(R.id.content, recipesListFragment);
