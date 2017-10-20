@@ -254,13 +254,17 @@ public class StepDetailFragment extends BaseFragment implements StepDetailView, 
     @Override
     public void onResume() {
         super.onResume();
-        initializePlayer(presenter.getVideoTime(), presenter.getVideoAutoPlay());
+        if (presenter.containsVideo()) {
+            initializePlayer(presenter.getVideoTime(), presenter.getVideoAutoPlay());
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        releasePlayer();
+        if (presenter.containsVideo()) {
+            releasePlayer();
+        }
     }
 
     @SuppressLint("InlinedApi")

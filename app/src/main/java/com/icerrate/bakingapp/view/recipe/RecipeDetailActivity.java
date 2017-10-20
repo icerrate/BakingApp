@@ -28,7 +28,7 @@ public class RecipeDetailActivity extends BaseActivity implements RecipeDetailAc
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
         setNavigationToolbar(true);
-        if (savedInstanceState == null) {
+        if (savedInstanceState == null && getIntent().hasExtra(KEY_RECIPE_ID)) {
             recipeId = getIntent().getIntExtra(KEY_RECIPE_ID, 0);
             if(isPhone) {
                 RecipeDetailFragment recipeDetailFragment = RecipeDetailFragment.newInstance(recipeId, -1);

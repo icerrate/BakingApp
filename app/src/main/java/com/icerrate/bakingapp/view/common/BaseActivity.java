@@ -34,9 +34,6 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseFrag
         unbinder = ButterKnife.bind(this);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        if(isPhone){
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }
     }
 
     @Override

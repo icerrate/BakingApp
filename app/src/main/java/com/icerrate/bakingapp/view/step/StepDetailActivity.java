@@ -24,7 +24,7 @@ public class StepDetailActivity extends BaseActivity {
         setContentView(R.layout.activity_base);
         setNavigationToolbar(true);
         enableRotation();
-        if (savedInstanceState == null) {
+        if (savedInstanceState == null && getIntent().hasExtra(KEY_RECIPE_ID) && getIntent().hasExtra(KEY_SELECTED_STEP)) {
             Integer recipeId = getIntent().getIntExtra(KEY_RECIPE_ID, -1);
             Integer selectedStep = getIntent().getIntExtra(KEY_SELECTED_STEP, -1);
             StepDetailFragment stepDetailFragment = StepDetailFragment.newInstance(recipeId, selectedStep);
